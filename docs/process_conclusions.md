@@ -83,3 +83,7 @@ Implement residual branch masks and evaluation-only lesion runs after baseline t
 ## Smoke Test Observations
 
 The smoke test exercises model construction, one short training loop, evaluation, gradient recording, figure generation, and table generation. These outputs validate the pipeline mechanics; they should not be used as scientific evidence about ResNet behavior.
+
+## Identity Mapping Experiment Observations
+
+This lightweight identity-mapping run produced comparable metrics and layer-wise gradient statistics for PlainNet, standard ResNet, PreAct ResNet, and scaled shortcut variants. Because the run is intentionally small, conclusions should be treated as preliminary pipeline evidence.
