@@ -16,6 +16,8 @@ data/*.tar.gz
 
 results/checkpoints/*.pt
 results/checkpoints/*.pth
+results/**/checkpoints/*.pt
+results/**/checkpoints/*.pth
 results/runs/*/checkpoints/
 results/runs/*/*.pt
 results/runs/*/*.pth

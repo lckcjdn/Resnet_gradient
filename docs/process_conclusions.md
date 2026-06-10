@@ -79,3 +79,7 @@ No trained checkpoint is available yet.
 Implement residual branch masks and evaluation-only lesion runs after baseline training.
 
 ---
+
+## Smoke Test Observations
+
+The smoke test exercises model construction, one short training loop, evaluation, gradient recording, figure generation, and table generation. These outputs validate the pipeline mechanics; they should not be used as scientific evidence about ResNet behavior.

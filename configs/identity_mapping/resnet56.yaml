@@ -1,0 +1,5 @@
+extends: ../default.yaml
+model:
+  name: ResNetV1
+  depth: 56
+  shortcut_lambda: 1.0

@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+from typing import Optional
 
-def evaluate(model, loader, criterion, device: str = "cpu") -> dict[str, float]:
+
+def evaluate(model, loader, criterion, device: str = "cpu", max_batches: Optional[int] = None) -> dict[str, float]:
     """Evaluate a model without gradient updates."""
     import torch
 
@@ -12,7 +14,9 @@ def evaluate(model, loader, criterion, device: str = "cpu") -> dict[str, float]:
     correct = 0
     total = 0
     with torch.no_grad():
-        for inputs, targets in loader:
+        for batch_index, (inputs, targets) in enumerate(loader):
+            if max_batches is not None and batch_index >= max_batches:
+                break
             inputs = inputs.to(device)
             targets = targets.to(device)
             outputs = model(inputs)

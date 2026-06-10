@@ -1,0 +1,29 @@
+{
+  "run": "smoke_test",
+  "command": "D:\\\u7814\u7a76\u751f\u8bfe\u7a0b\\python\u8bfe\u7a0b\\ResNet\\resnet-gradient-path-study\\harness\\run_suite.py --suite smoke --dataset fake --epochs 1 --train-size 96 --val-size 48 --batch-size 24 --learning-rate 0.01 --device cpu --torch-threads 2",
+  "dataset": {
+    "name": "FakeData",
+    "train_size": 96,
+    "val_size": 48,
+    "root": "data",
+    "fallback_reason": "FakeData explicitly requested."
+  },
+  "figures": [
+    "results\\figures\\smoke_loss_curve.png",
+    "results\\figures\\smoke_accuracy_curve.png",
+    "results\\figures\\smoke_layerwise_grad_norm.png",
+    "results\\figures\\smoke_gradient_heatmap.png"
+  ],
+  "tables": [
+    "results\\tables\\smoke_model_comparison.csv",
+    "results\\tables\\smoke_gradient_stability.csv",
+    "results\\tables\\smoke_status.csv"
+  ],
+  "gradient_path": "results\\gradients\\smoke_gradient_stats.csv",
+  "checkpoints": {
+    "PlainNet-20": "results\\checkpoints\\PlainNet-20.pt",
+    "ResNet-20": "results\\checkpoints\\ResNet-20.pt",
+    "PreActResNet-20": "results\\checkpoints\\PreActResNet-20.pt",
+    "ScaledShortcutResNet-20-lambda1.0": "results\\checkpoints\\ScaledShortcutResNet-20-lambda1.0.pt"
+  }
+}

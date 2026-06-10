@@ -3,40 +3,37 @@
 from __future__ import annotations
 
 import argparse
-from pathlib import Path
 from typing import List, Optional
 
-from .run_experiment import main as run_one
+from .mini_experiments import run_identity, run_smoke
 
 
-SUITES = {
-    "quick": ["configs/plain56.yaml", "configs/resnet56.yaml", "configs/preact_resnet56.yaml"],
-    "full": [
-        "configs/plain56.yaml",
-        "configs/resnet56.yaml",
-        "configs/preact_resnet56.yaml",
-        "configs/scaled_lambda_05.yaml",
-        "configs/scaled_lambda_09.yaml",
-        "configs/scaled_lambda_10.yaml",
-        "configs/scaled_lambda_11.yaml",
-        "configs/lesion.yaml",
-    ],
-}
+SUITES = ("smoke", "identity")
 
 
 def main(argv: Optional[List[str]] = None) -> int:
     parser = argparse.ArgumentParser(description="Run a suite of experiments.")
-    parser.add_argument("--suite", choices=sorted(SUITES), default="quick")
-    parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--suite", choices=SUITES, default="smoke")
+    parser.add_argument("--dataset", choices=["auto", "cifar10", "fake"], default="auto")
+    parser.add_argument("--download", action="store_true", help="Allow CIFAR-10 download before FakeData fallback.")
+    parser.add_argument("--epochs", type=int, default=1)
+    parser.add_argument("--train-size", type=int, default=128)
+    parser.add_argument("--val-size", type=int, default=64)
+    parser.add_argument("--batch-size", type=int, default=32)
+    parser.add_argument("--learning-rate", type=float, default=0.01)
+    parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument("--device", default="auto")
+    parser.add_argument("--max-train-batches", type=int, default=None)
+    parser.add_argument("--max-eval-batches", type=int, default=None)
+    parser.add_argument("--torch-threads", type=int, default=2)
     args = parser.parse_args(argv)
 
-    for config in SUITES[args.suite]:
-        if not Path(config).exists():
-            parser.error(f"Config does not exist: {config}")
-        run_args = ["--config", config]
-        if args.dry_run:
-            run_args.append("--dry-run")
-        run_one(run_args)
+    if args.suite == "smoke":
+        run_smoke(args)
+    elif args.suite == "identity":
+        run_identity(args)
+    else:
+        parser.error(f"Unknown suite: {args.suite}")
     return 0
 
 
