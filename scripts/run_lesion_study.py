@@ -1,9 +1,9 @@
-"""Placeholder entry point for lesion studies."""
+"""Thin wrapper for lesion studies."""
 
 from __future__ import annotations
 
-from harness.run_experiment import main
+from harness.lesion_study import main
 
 
 if __name__ == "__main__":
-    raise SystemExit(main(["--config", "configs/lesion.yaml", "--dry-run"]))
+    raise SystemExit(main())

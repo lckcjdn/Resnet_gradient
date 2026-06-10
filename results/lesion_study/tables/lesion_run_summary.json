@@ -1,0 +1,28 @@
+{
+  "checkpoint": "results\\identity_mapping\\checkpoints\\PreActResNet-56.pt",
+  "model": "PreActResNet-56",
+  "dataset": {
+    "name": "FakeData",
+    "train_size": 72,
+    "val_size": 72,
+    "root": "data",
+    "fallback_reason": "CIFAR-10 unavailable; using FakeData fallback: Dataset not found or corrupted. You can use download=True to download it"
+  },
+  "baseline": {
+    "loss": 2.302787939707438,
+    "accuracy": 0.1111111111111111
+  },
+  "tables": [
+    "results\\lesion_study\\tables\\table_lesion_accuracy.csv",
+    "results\\lesion_study\\tables\\table_lesion_drop_strategy_comparison.csv",
+    "results\\lesion_study\\tables\\table_active_blocks_summary.csv"
+  ],
+  "figures": [
+    "results\\lesion_study\\figures\\fig_lesion_accuracy_vs_drop_ratio.png",
+    "results\\lesion_study\\figures\\fig_lesion_accuracy_drop_vs_drop_ratio.png",
+    "results\\lesion_study\\figures\\fig_lesion_random_vs_early_vs_late.png",
+    "results\\lesion_study\\figures\\fig_active_blocks_vs_accuracy.png",
+    "results\\lesion_study\\figures\\fig_lesion_heatmap.png"
+  ],
+  "log": "results\\lesion_study\\logs\\lesion_study_log.md"
+}

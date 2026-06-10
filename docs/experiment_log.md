@@ -53,3 +53,15 @@
 - Status: completed
 
 ---
+
+## Run: Short-path Ensemble Lesion Study
+
+- Date: 2026-06-10T23:25:57
+- Command: `D:\研究生课程\python课程\ResNet\resnet-gradient-path-study\harness\lesion_study.py --dataset auto --val-size 72 --batch-size 24 --device cpu --torch-threads 2 --drop-ratios 0,0.1,0.3,0.5,0.7 --random-seeds 0,1,2`
+- Checkpoint: `results\identity_mapping\checkpoints\PreActResNet-56.pt`
+- Dataset note: CIFAR-10 unavailable; using FakeData fallback: Dataset not found or corrupted. You can use download=True to download it
+- Figures: `results\lesion_study\figures\fig_lesion_accuracy_vs_drop_ratio.png`, `results\lesion_study\figures\fig_lesion_accuracy_drop_vs_drop_ratio.png`, `results\lesion_study\figures\fig_lesion_random_vs_early_vs_late.png`, `results\lesion_study\figures\fig_active_blocks_vs_accuracy.png`, `results\lesion_study\figures\fig_lesion_heatmap.png`
+- Tables: `results\lesion_study\tables\table_lesion_accuracy.csv`, `results\lesion_study\tables\table_lesion_drop_strategy_comparison.csv`, `results\lesion_study\tables\table_active_blocks_summary.csv`
+- Status: completed
+
+---

@@ -87,3 +87,7 @@ The smoke test exercises model construction, one short training loop, evaluation
 ## Identity Mapping Experiment Observations
 
 This lightweight identity-mapping run produced comparable metrics and layer-wise gradient statistics for PlainNet, standard ResNet, PreAct ResNet, and scaled shortcut variants. Because the run is intentionally small, conclusions should be treated as preliminary pipeline evidence.
+
+## Lesion Study Observations
+
+The lesion study verifies that residual branch masks can be applied without breaking the forward path. Because this run uses a lightweight checkpoint and may use FakeData fallback, the observed accuracy trend should be interpreted as pipeline evidence and a preliminary illustration rather than a final scientific result.
