@@ -1,0 +1,15 @@
+name: resnet-gradient-path-study
+channels:
+  - pytorch
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - numpy
+  - pandas
+  - matplotlib
+  - pyyaml
+  - tqdm
+  - pip:
+      - torch
+      - torchvision

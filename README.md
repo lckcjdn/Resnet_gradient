@@ -10,13 +10,14 @@ The goal is not to maximize CIFAR-10 accuracy. The goal is to run controlled com
 ## Quick Start
 
 ```bash
-python -m venv .venv
-.venv\Scripts\activate
-pip install -r requirements.txt
+conda env create -f environment.yml
+conda activate resnet-gradient-path-study
 python -m harness.sanity_check
 ```
 
-No full experiment should be run during initialization. Use the sanity check first, then implement and validate one small training path before launching longer runs.
+If the conda package channels are unavailable on this machine, create the environment with an available local conda source and then install missing packages inside that environment. The experiments in this repository were run through `conda run -n resnet-gradient-path-study ...`.
+
+No full experiment should be run during initialization. Use the sanity check first, then validate the smoke experiment before launching longer runs.
 
 ## Project Layout
 
@@ -36,3 +37,11 @@ python -m compileall src harness scripts
 ```
 
 The sanity check creates missing result directories and, when PyTorch is installed, runs a tiny forward/backward pass for each model family.
+
+## Experiment Commands
+
+```bash
+python -m harness.run_suite --suite smoke --dataset fake --epochs 1 --train-size 96 --val-size 48 --batch-size 24 --learning-rate 0.01 --device cpu --torch-threads 2
+python -m harness.run_suite --suite identity --dataset auto --epochs 1 --train-size 112 --val-size 56 --batch-size 28 --learning-rate 0.01 --device cpu --torch-threads 2
+python -m harness.lesion_study --dataset auto --val-size 72 --batch-size 24 --device cpu --torch-threads 2 --drop-ratios 0,0.1,0.3,0.5,0.7 --random-seeds 0,1,2
+```
