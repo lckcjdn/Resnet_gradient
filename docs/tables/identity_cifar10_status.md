@@ -1,0 +1,9 @@
+| run | model | status | checkpoint_path | notes |
+| --- | --- | --- | --- | --- |
+| identity_mapping_cifar10 | PlainNet-56 | completed | results\identity_mapping_cifar10\checkpoints\PlainNet-56.pt |  |
+| identity_mapping_cifar10 | ResNet-56 | completed | results\identity_mapping_cifar10\checkpoints\ResNet-56.pt |  |
+| identity_mapping_cifar10 | PreActResNet-56 | completed | results\identity_mapping_cifar10\checkpoints\PreActResNet-56.pt |  |
+| identity_mapping_cifar10 | ScaledShortcutResNet-56-lambda0.5 | completed | results\identity_mapping_cifar10\checkpoints\ScaledShortcutResNet-56-lambda0.5.pt |  |
+| identity_mapping_cifar10 | ScaledShortcutResNet-56-lambda0.9 | completed | results\identity_mapping_cifar10\checkpoints\ScaledShortcutResNet-56-lambda0.9.pt |  |
+| identity_mapping_cifar10 | ScaledShortcutResNet-56-lambda1.0 | completed | results\identity_mapping_cifar10\checkpoints\ScaledShortcutResNet-56-lambda1.0.pt |  |
+| identity_mapping_cifar10 | ScaledShortcutResNet-56-lambda1.1 | completed | results\identity_mapping_cifar10\checkpoints\ScaledShortcutResNet-56-lambda1.1.pt |  |

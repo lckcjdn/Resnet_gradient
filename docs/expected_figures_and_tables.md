@@ -80,3 +80,75 @@
 - `results\lesion_study\tables\table_lesion_accuracy.csv`
 - `results\lesion_study\tables\table_lesion_drop_strategy_comparison.csv`
 - `results\lesion_study\tables\table_active_blocks_summary.csv`
+
+## Generated Artifacts: Smoke Test (cifar10)
+
+- Command: `D:\研究生课程\python课程\ResNet\resnet-gradient-path-study\harness\run_suite.py --suite smoke --dataset cifar10 --download --output-tag cifar10 --epochs 2 --train-size 512 --val-size 256 --batch-size 64 --learning-rate 0.05 --device auto --torch-threads 2`
+- Dataset: CIFAR10
+
+### Figures
+- `results\smoke_cifar10\figures\smoke_loss_curve.png`
+- `results\smoke_cifar10\figures\smoke_accuracy_curve.png`
+- `results\smoke_cifar10\figures\smoke_layerwise_grad_norm.png`
+- `results\smoke_cifar10\figures\smoke_gradient_heatmap.png`
+
+### Tables
+- `results\smoke_cifar10\tables\smoke_cifar10_model_comparison.csv`
+- `results\smoke_cifar10\tables\smoke_cifar10_gradient_stability.csv`
+- `results\smoke_cifar10\tables\smoke_cifar10_status.csv`
+- `results\smoke_cifar10\gradients\smoke_cifar10_gradient_stats.csv`
+
+## Generated Artifacts: Smoke Test (cifar10)
+
+- Command: `D:\研究生课程\python课程\ResNet\resnet-gradient-path-study\harness\run_suite.py --suite smoke --dataset cifar10 --download --output-tag cifar10 --epochs 2 --train-size 512 --val-size 256 --batch-size 64 --learning-rate 0.05 --device auto --torch-threads 2`
+- Dataset: CIFAR10
+
+### Figures
+- `results\smoke_cifar10\figures\smoke_loss_curve.png`
+- `results\smoke_cifar10\figures\smoke_accuracy_curve.png`
+- `results\smoke_cifar10\figures\smoke_layerwise_grad_norm.png`
+- `results\smoke_cifar10\figures\smoke_gradient_heatmap.png`
+
+### Tables
+- `results\smoke_cifar10\tables\smoke_cifar10_model_comparison.csv`
+- `results\smoke_cifar10\tables\smoke_cifar10_gradient_stability.csv`
+- `results\smoke_cifar10\tables\smoke_cifar10_status.csv`
+- `results\smoke_cifar10\gradients\smoke_cifar10_gradient_stats.csv`
+
+## Generated Artifacts: Identity Mapping Experiment (cifar10)
+
+- Command: `D:\研究生课程\python课程\ResNet\resnet-gradient-path-study\harness\run_suite.py --suite identity --dataset cifar10 --download --output-tag cifar10 --epochs 3 --train-size 2048 --val-size 512 --batch-size 128 --learning-rate 0.05 --device auto --torch-threads 2`
+- Dataset: CIFAR10
+
+### Figures
+- `results\identity_mapping_cifar10\figures\fig_identity_loss_curve.png`
+- `results\identity_mapping_cifar10\figures\fig_identity_accuracy_curve.png`
+- `results\identity_mapping_cifar10\figures\fig_identity_layerwise_grad_norm.png`
+- `results\identity_mapping_cifar10\figures\fig_identity_gradient_heatmap_all.png`
+- `results\identity_mapping_cifar10\figures\fig_identity_gradient_heatmap_plainnet.png`
+- `results\identity_mapping_cifar10\figures\fig_identity_gradient_heatmap_resnet.png`
+- `results\identity_mapping_cifar10\figures\fig_identity_gradient_heatmap_preact_resnet.png`
+- `results\identity_mapping_cifar10\figures\fig_identity_lambda_ablation_grad_ratio.png`
+
+### Tables
+- `results\identity_mapping_cifar10\tables\table_identity_cifar10_model_comparison.csv`
+- `results\identity_mapping_cifar10\tables\table_identity_cifar10_gradient_stability.csv`
+- `results\identity_mapping_cifar10\tables\table_identity_cifar10_lambda_ablation.csv`
+- `results\identity_mapping_cifar10\gradients\identity_cifar10_gradient_stats.csv`
+
+## Generated Artifacts: Short-path Ensemble Lesion Study (cifar10)
+
+- Command: `D:\研究生课程\python课程\ResNet\resnet-gradient-path-study\harness\lesion_study.py --dataset cifar10 --download --output-tag cifar10 --val-size 512 --batch-size 128 --device auto --torch-threads 2 --drop-ratios 0,0.1,0.3,0.5,0.7 --random-seeds 0,1,2`
+- Checkpoint: `results\identity_mapping_cifar10\checkpoints\PreActResNet-56.pt`
+
+### Figures
+- `results\lesion_study_cifar10\figures\fig_lesion_accuracy_vs_drop_ratio.png`
+- `results\lesion_study_cifar10\figures\fig_lesion_accuracy_drop_vs_drop_ratio.png`
+- `results\lesion_study_cifar10\figures\fig_lesion_random_vs_early_vs_late.png`
+- `results\lesion_study_cifar10\figures\fig_active_blocks_vs_accuracy.png`
+- `results\lesion_study_cifar10\figures\fig_lesion_heatmap.png`
+
+### Tables
+- `results\lesion_study_cifar10\tables\table_lesion_accuracy.csv`
+- `results\lesion_study_cifar10\tables\table_lesion_drop_strategy_comparison.csv`
+- `results\lesion_study_cifar10\tables\table_active_blocks_summary.csv`

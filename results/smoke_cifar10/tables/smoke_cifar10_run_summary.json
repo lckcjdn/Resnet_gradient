@@ -1,0 +1,29 @@
+{
+  "run": "smoke_test_cifar10",
+  "command": "D:\\\u7814\u7a76\u751f\u8bfe\u7a0b\\python\u8bfe\u7a0b\\ResNet\\resnet-gradient-path-study\\harness\\run_suite.py --suite smoke --dataset cifar10 --download --output-tag cifar10 --epochs 2 --train-size 512 --val-size 256 --batch-size 64 --learning-rate 0.05 --device auto --torch-threads 2",
+  "dataset": {
+    "name": "CIFAR10",
+    "train_size": 512,
+    "val_size": 256,
+    "root": "data",
+    "fallback_reason": ""
+  },
+  "figures": [
+    "results\\smoke_cifar10\\figures\\smoke_loss_curve.png",
+    "results\\smoke_cifar10\\figures\\smoke_accuracy_curve.png",
+    "results\\smoke_cifar10\\figures\\smoke_layerwise_grad_norm.png",
+    "results\\smoke_cifar10\\figures\\smoke_gradient_heatmap.png"
+  ],
+  "tables": [
+    "results\\smoke_cifar10\\tables\\smoke_cifar10_model_comparison.csv",
+    "results\\smoke_cifar10\\tables\\smoke_cifar10_gradient_stability.csv",
+    "results\\smoke_cifar10\\tables\\smoke_cifar10_status.csv"
+  ],
+  "gradient_path": "results\\smoke_cifar10\\gradients\\smoke_cifar10_gradient_stats.csv",
+  "checkpoints": {
+    "PlainNet-20": "results\\smoke_cifar10\\checkpoints\\PlainNet-20.pt",
+    "ResNet-20": "results\\smoke_cifar10\\checkpoints\\ResNet-20.pt",
+    "PreActResNet-20": "results\\smoke_cifar10\\checkpoints\\PreActResNet-20.pt",
+    "ScaledShortcutResNet-20-lambda1.0": "results\\smoke_cifar10\\checkpoints\\ScaledShortcutResNet-20-lambda1.0.pt"
+  }
+}

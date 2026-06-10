@@ -46,8 +46,13 @@ def append(path: Path, text: str) -> None:
         handle.write(text)
 
 
-def ensure_dirs() -> Dict[str, Path]:
-    root = Path("results") / "lesion_study"
+def clean_tag(tag: str) -> str:
+    return "".join(char.lower() if char.isalnum() else "_" for char in tag).strip("_")
+
+
+def ensure_dirs(output_tag: str = "") -> Dict[str, Path]:
+    output_tag = clean_tag(output_tag)
+    root = Path("results") / ("lesion_study" if not output_tag else f"lesion_study_{output_tag}")
     paths = {
         "logs": root / "logs",
         "figures": root / "figures",
@@ -59,10 +64,18 @@ def ensure_dirs() -> Dict[str, Path]:
     return paths
 
 
-def find_checkpoint(explicit: Optional[str] = None) -> Path:
+def find_checkpoint(explicit: Optional[str] = None, output_tag: str = "") -> Path:
+    output_tag = clean_tag(output_tag)
     candidates = []
     if explicit:
         candidates.append(Path(explicit))
+    if output_tag:
+        candidates.extend(
+            [
+                Path(f"results/identity_mapping_{output_tag}/checkpoints/PreActResNet-56.pt"),
+                Path(f"results/identity_mapping_{output_tag}/checkpoints/ResNet-56.pt"),
+            ]
+        )
     candidates.extend(
         [
             Path("results/identity_mapping/checkpoints/PreActResNet-56.pt"),
@@ -210,9 +223,10 @@ def run_lesion(args) -> Dict[str, object]:
     from torch import nn
 
     torch.set_num_threads(max(1, args.torch_threads))
-    paths = ensure_dirs()
+    output_tag = clean_tag(args.output_tag)
+    paths = ensure_dirs(output_tag)
     device = choose_device(args.device)
-    checkpoint_path = find_checkpoint(args.checkpoint)
+    checkpoint_path = find_checkpoint(args.checkpoint, output_tag)
     model, payload = load_model_from_checkpoint(checkpoint_path, device)
     if not hasattr(model, "iter_blocks"):
         raise TypeError("Selected checkpoint model does not support residual branch masking.")
@@ -285,7 +299,8 @@ def run_lesion(args) -> Dict[str, object]:
     write_csv(table_strategy, aggregate)
     write_csv(table_active, aggregate)
     for table in (table_accuracy, table_strategy, table_active):
-        csv_to_markdown(table, Path("docs") / "tables" / f"{table.stem}.md")
+        md_stem = table.stem if not output_tag else f"{table.stem}_{output_tag}"
+        csv_to_markdown(table, Path("docs") / "tables" / f"{md_stem}.md")
 
     fig_accuracy = paths["figures"] / "fig_lesion_accuracy_vs_drop_ratio.png"
     fig_drop = paths["figures"] / "fig_lesion_accuracy_drop_vs_drop_ratio.png"
@@ -329,20 +344,26 @@ def run_lesion(args) -> Dict[str, object]:
         "log": str(log_path),
     }
     (paths["tables"] / "lesion_run_summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
-    update_docs(command, summary, dataset_info.fallback_reason or "none")
+    update_docs(command, summary, dataset_info.fallback_reason or "none", output_tag)
     return summary
 
 
-def update_docs(command: str, summary: Dict[str, object], dataset_note: str) -> None:
+def update_docs(command: str, summary: Dict[str, object], dataset_note: str, output_tag: str = "") -> None:
     figures = [Path(path) for path in summary["figures"]]
     tables = [Path(path) for path in summary["tables"]]
+    dataset_name = summary.get("dataset", {}).get("name", "")
+    dataset_limit = (
+        "- This run used real CIFAR-10 validation samples, but the checkpoint was still trained with a lightweight budget."
+        if dataset_name == "CIFAR10"
+        else "- The checkpoint is lightweight and may be trained on FakeData fallback."
+    )
     now = datetime.now().isoformat(timespec="seconds")
     append(
         Path("docs") / "experiment_log.md",
         "\n".join(
             [
                 "",
-                "## Run: Short-path Ensemble Lesion Study",
+                "## Run: Short-path Ensemble Lesion Study" if not output_tag else f"## Run: Short-path Ensemble Lesion Study ({output_tag})",
                 "",
                 f"- Date: {now}",
                 f"- Command: `{command}`",
@@ -372,7 +393,7 @@ def update_docs(command: str, summary: Dict[str, object], dataset_note: str) -> 
     generated_text = "\n".join(
         [
             "",
-            "## Generated Artifacts: Short-path Ensemble Lesion Study",
+            "## Generated Artifacts: Short-path Ensemble Lesion Study" if not output_tag else f"## Generated Artifacts: Short-path Ensemble Lesion Study ({output_tag})",
             "",
             f"- Command: `{command}`",
             f"- Checkpoint: `{summary['checkpoint']}`",
@@ -425,12 +446,17 @@ def update_docs(command: str, summary: Dict[str, object], dataset_note: str) -> 
         "",
         "## Limitations",
         "",
-        "- The checkpoint is lightweight and may be trained on FakeData fallback.",
+        dataset_limit,
         "- Accuracy values should not be used as final CIFAR-10 evidence unless rerun with real CIFAR-10 and longer training.",
         "- Results support cautious interpretation only.",
         "",
     ]
-    Path("docs/short_path_ensemble_experiment.md").write_text("\n".join(text), encoding="utf-8")
+    doc_name = (
+        "short_path_ensemble_experiment.md"
+        if not output_tag
+        else f"short_path_ensemble_experiment_{output_tag}.md"
+    )
+    Path("docs", doc_name).write_text("\n".join(text), encoding="utf-8")
 
 
 def main(argv: Optional[List[str]] = None) -> int:
@@ -446,6 +472,11 @@ def main(argv: Optional[List[str]] = None) -> int:
     parser.add_argument("--drop-ratios", default="0,0.1,0.3,0.5,0.7")
     parser.add_argument("--max-eval-batches", type=int, default=None)
     parser.add_argument("--torch-threads", type=int, default=2)
+    parser.add_argument(
+        "--output-tag",
+        default="",
+        help="Optional suffix for result directory and docs, e.g. cifar10.",
+    )
     args = parser.parse_args(argv)
     run_lesion(args)
     return 0

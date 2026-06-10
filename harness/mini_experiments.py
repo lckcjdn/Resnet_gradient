@@ -86,6 +86,15 @@ def ensure_dirs(root: Path) -> Dict[str, Path]:
     return paths
 
 
+def clean_tag(tag: str) -> str:
+    return "".join(char.lower() if char.isalnum() else "_" for char in tag).strip("_")
+
+
+def tagged_name(base: str, tag: str) -> str:
+    tag = clean_tag(tag)
+    return base if not tag else f"{base}_{tag}"
+
+
 def write_csv(path: Path, rows: Sequence[Dict], fieldnames: Optional[Sequence[str]] = None) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     if fieldnames is None:
@@ -242,7 +251,7 @@ def run_model_suite(
     torch.set_num_threads(max(1, settings.torch_threads))
     paths = ensure_dirs(settings.result_root)
     device = choose_device(settings.device)
-    train_loader, val_loader, dataset_info = build_small_image_loaders(
+    _, _, dataset_info = build_small_image_loaders(
         dataset=settings.dataset,
         root="data",
         batch_size=settings.batch_size,
@@ -266,6 +275,16 @@ def run_model_suite(
         notes = ""
         checkpoint_path = paths["checkpoints"] / f"{spec.label}.pt"
         try:
+            train_loader, val_loader, dataset_info = build_small_image_loaders(
+                dataset=settings.dataset,
+                root="data",
+                batch_size=settings.batch_size,
+                train_size=settings.train_size,
+                val_size=settings.val_size,
+                seed=settings.seed,
+                download=settings.download,
+                num_workers=settings.num_workers,
+            )
             set_global_seed(settings.seed)
             model = build_model(
                 spec.name,
@@ -552,8 +571,12 @@ def identity_specs() -> List[ModelSpec]:
 
 
 def run_smoke(args) -> Dict[str, object]:
+    output_tag = clean_tag(getattr(args, "output_tag", ""))
+    run_name = tagged_name("smoke_test", output_tag)
+    table_prefix = tagged_name("smoke", output_tag)
+    result_root = Path("results") if not output_tag else Path("results") / f"smoke_{output_tag}"
     settings = RunSettings(
-        result_root=Path("results"),
+        result_root=result_root,
         dataset=args.dataset,
         download=args.download,
         train_size=args.train_size,
@@ -571,7 +594,7 @@ def run_smoke(args) -> Dict[str, object]:
     result = run_model_suite(
         smoke_specs(),
         settings,
-        run_name="smoke_test",
+        run_name=run_name,
         command=command,
         figure_names={
             "loss": "smoke_loss_curve.png",
@@ -579,10 +602,10 @@ def run_smoke(args) -> Dict[str, object]:
             "layerwise": "smoke_layerwise_grad_norm.png",
             "heatmap": "smoke_gradient_heatmap.png",
         },
-        table_prefix="smoke",
+        table_prefix=table_prefix,
     )
     append_common_docs(
-        "Smoke Test",
+        "Smoke Test" if not output_tag else f"Smoke Test ({output_tag})",
         command,
         result,
         (
@@ -618,8 +641,16 @@ def run_smoke(args) -> Dict[str, object]:
 
 
 def run_identity(args) -> Dict[str, object]:
+    output_tag = clean_tag(getattr(args, "output_tag", ""))
+    run_name = tagged_name("identity_mapping", output_tag)
+    table_prefix = tagged_name("identity", output_tag)
+    result_root = (
+        Path("results") / "identity_mapping"
+        if not output_tag
+        else Path("results") / f"identity_mapping_{output_tag}"
+    )
     settings = RunSettings(
-        result_root=Path("results") / "identity_mapping",
+        result_root=result_root,
         dataset=args.dataset,
         download=args.download,
         train_size=args.train_size,
@@ -637,7 +668,7 @@ def run_identity(args) -> Dict[str, object]:
     result = run_model_suite(
         identity_specs(),
         settings,
-        run_name="identity_mapping",
+        run_name=run_name,
         command=command,
         figure_names={
             "loss": "fig_identity_loss_curve.png",
@@ -645,11 +676,11 @@ def run_identity(args) -> Dict[str, object]:
             "layerwise": "fig_identity_layerwise_grad_norm.png",
             "heatmap": "fig_identity_gradient_heatmap_all.png",
         },
-        table_prefix="identity",
+        table_prefix=table_prefix,
     )
 
     gradients = result["gradients"]
-    fig_dir = Path("results") / "identity_mapping" / "figures"
+    fig_dir = result_root / "figures"
     for model, filename in [
         ("PlainNet-56", "fig_identity_gradient_heatmap_plainnet.png"),
         ("ResNet-56", "fig_identity_gradient_heatmap_resnet.png"),
@@ -661,10 +692,11 @@ def run_identity(args) -> Dict[str, object]:
     plot_lambda_ablation(result["summary"], lambda_path)
     result["figures"].append(lambda_path)
 
-    table_dir = Path("results") / "identity_mapping" / "tables"
-    model_table = table_dir / "table_identity_model_comparison.csv"
-    gradient_table = table_dir / "table_identity_gradient_stability.csv"
-    lambda_table = table_dir / "table_identity_lambda_ablation.csv"
+    table_dir = result_root / "tables"
+    table_stem = tagged_name("table_identity", output_tag)
+    model_table = table_dir / f"{table_stem}_model_comparison.csv"
+    gradient_table = table_dir / f"{table_stem}_gradient_stability.csv"
+    lambda_table = table_dir / f"{table_stem}_lambda_ablation.csv"
     write_csv(model_table, result["summary"])
     write_csv(gradient_table, result["summary"])
     write_csv(
@@ -676,7 +708,7 @@ def run_identity(args) -> Dict[str, object]:
     result["tables"] = [model_table, gradient_table, lambda_table]
 
     append_common_docs(
-        "Identity Mapping Experiment",
+        "Identity Mapping Experiment" if not output_tag else f"Identity Mapping Experiment ({output_tag})",
         command,
         result,
         (
@@ -686,14 +718,19 @@ def run_identity(args) -> Dict[str, object]:
             "small, conclusions should be treated as preliminary pipeline evidence."
         ),
     )
-    write_identity_doc(command, result)
+    write_identity_doc(command, result, output_tag)
     return result
 
 
-def write_identity_doc(command: str, result: Dict[str, object]) -> None:
+def write_identity_doc(command: str, result: Dict[str, object], output_tag: str = "") -> None:
     dataset_info = result["dataset_info"]
     figures = result["figures"]
     tables = result["tables"]
+    dataset_limit = (
+        "- This run used real CIFAR-10 data, but still only a subset and a short training budget."
+        if dataset_info.name == "CIFAR10"
+        else "- FakeData fallback validates pipeline behavior rather than CIFAR-10 scientific trends."
+    )
     text = [
         "# Identity Mapping Experiment",
         "",
@@ -733,8 +770,9 @@ def write_identity_doc(command: str, result: Dict[str, object]) -> None:
         "## Limitations",
         "",
         "- Small dataset subset and short training budget.",
-        "- FakeData fallback, if used, validates pipeline behavior rather than CIFAR-10 scientific trends.",
+        dataset_limit,
         "- Single seed unless rerun with additional seeds.",
         "",
     ]
-    Path("docs/identity_mapping_experiment.md").write_text("\n".join(text), encoding="utf-8")
+    doc_name = "identity_mapping_experiment.md" if not output_tag else f"identity_mapping_experiment_{output_tag}.md"
+    Path("docs", doc_name).write_text("\n".join(text), encoding="utf-8")

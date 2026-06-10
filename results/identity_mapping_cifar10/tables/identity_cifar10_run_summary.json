@@ -1,0 +1,32 @@
+{
+  "run": "identity_mapping_cifar10",
+  "command": "D:\\\u7814\u7a76\u751f\u8bfe\u7a0b\\python\u8bfe\u7a0b\\ResNet\\resnet-gradient-path-study\\harness\\run_suite.py --suite identity --dataset cifar10 --download --output-tag cifar10 --epochs 3 --train-size 2048 --val-size 512 --batch-size 128 --learning-rate 0.05 --device auto --torch-threads 2",
+  "dataset": {
+    "name": "CIFAR10",
+    "train_size": 2048,
+    "val_size": 512,
+    "root": "data",
+    "fallback_reason": ""
+  },
+  "figures": [
+    "results\\identity_mapping_cifar10\\figures\\fig_identity_loss_curve.png",
+    "results\\identity_mapping_cifar10\\figures\\fig_identity_accuracy_curve.png",
+    "results\\identity_mapping_cifar10\\figures\\fig_identity_layerwise_grad_norm.png",
+    "results\\identity_mapping_cifar10\\figures\\fig_identity_gradient_heatmap_all.png"
+  ],
+  "tables": [
+    "results\\identity_mapping_cifar10\\tables\\identity_cifar10_model_comparison.csv",
+    "results\\identity_mapping_cifar10\\tables\\identity_cifar10_gradient_stability.csv",
+    "results\\identity_mapping_cifar10\\tables\\identity_cifar10_status.csv"
+  ],
+  "gradient_path": "results\\identity_mapping_cifar10\\gradients\\identity_cifar10_gradient_stats.csv",
+  "checkpoints": {
+    "PlainNet-56": "results\\identity_mapping_cifar10\\checkpoints\\PlainNet-56.pt",
+    "ResNet-56": "results\\identity_mapping_cifar10\\checkpoints\\ResNet-56.pt",
+    "PreActResNet-56": "results\\identity_mapping_cifar10\\checkpoints\\PreActResNet-56.pt",
+    "ScaledShortcutResNet-56-lambda0.5": "results\\identity_mapping_cifar10\\checkpoints\\ScaledShortcutResNet-56-lambda0.5.pt",
+    "ScaledShortcutResNet-56-lambda0.9": "results\\identity_mapping_cifar10\\checkpoints\\ScaledShortcutResNet-56-lambda0.9.pt",
+    "ScaledShortcutResNet-56-lambda1.0": "results\\identity_mapping_cifar10\\checkpoints\\ScaledShortcutResNet-56-lambda1.0.pt",
+    "ScaledShortcutResNet-56-lambda1.1": "results\\identity_mapping_cifar10\\checkpoints\\ScaledShortcutResNet-56-lambda1.1.pt"
+  }
+}

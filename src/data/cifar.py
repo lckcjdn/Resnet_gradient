@@ -147,11 +147,13 @@ def build_small_image_loaders(
         train_set = torch.utils.data.Subset(train_set, train_indices)
         val_set = torch.utils.data.Subset(val_set, val_indices)
 
+    loader_generator = torch.Generator().manual_seed(seed)
     train_loader = torch.utils.data.DataLoader(
         train_set,
         batch_size=batch_size,
         shuffle=True,
         num_workers=num_workers,
+        generator=loader_generator,
     )
     val_loader = torch.utils.data.DataLoader(
         val_set,

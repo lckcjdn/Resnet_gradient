@@ -26,6 +26,11 @@ def main(argv: Optional[List[str]] = None) -> int:
     parser.add_argument("--max-train-batches", type=int, default=None)
     parser.add_argument("--max-eval-batches", type=int, default=None)
     parser.add_argument("--torch-threads", type=int, default=2)
+    parser.add_argument(
+        "--output-tag",
+        default="",
+        help="Optional suffix for result directories and table names, e.g. cifar10.",
+    )
     args = parser.parse_args(argv)
 
     if args.suite == "smoke":
