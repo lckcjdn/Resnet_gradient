@@ -1,0 +1,10 @@
+extends: preact_resnet56.yaml
+lesion:
+  enabled: true
+  drop_ratios: [0.0, 0.1, 0.3, 0.5, 0.7, 0.9]
+  strategies:
+    - random_drop
+    - early_drop
+    - late_drop
+    - uniform_interval_drop
+  seed: 0

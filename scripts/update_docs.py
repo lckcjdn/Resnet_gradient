@@ -1,0 +1,12 @@
+"""Placeholder for documentation update workflow."""
+
+from __future__ import annotations
+
+
+def main() -> int:
+    print("Docs are initialized. Experiment-specific updates are deferred.")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

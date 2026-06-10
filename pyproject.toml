@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "resnet-gradient-path-study"
+version = "0.1.0"
+description = "Controlled ResNet experiments for gradient stability and short-path ensemble behavior."
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+  "torch",
+  "torchvision",
+  "numpy",
+  "pandas",
+  "matplotlib",
+  "PyYAML",
+  "tqdm",
+]
+
+[tool.setuptools.packages.find]
+include = ["src*", "harness*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = ["E501"]

@@ -1,0 +1,27 @@
+project:
+  name: resnet-gradient-path-study
+  output_dir: results
+
+dataset:
+  name: CIFAR10
+  root: data
+  num_classes: 10
+  download: true
+  augment: true
+
+training:
+  optimizer: SGD
+  learning_rate: 0.1
+  momentum: 0.9
+  weight_decay: 0.0005
+  batch_size: 128
+  epochs: 30
+  scheduler: MultiStepLR
+  milestones: [15, 25]
+  gamma: 0.1
+  seed: 0
+
+logging:
+  record_gradients: true
+  gradient_layers: conv2
+  save_checkpoint: true
