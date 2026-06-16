@@ -134,3 +134,62 @@ This lightweight identity-mapping run produced comparable metrics and layer-wise
 ## Lesion Study Observations
 
 The lesion study verifies that residual branch masks can be applied without breaking the forward path. Because this run uses a lightweight checkpoint and may use FakeData fallback, the observed accuracy trend should be interpreted as pipeline evidence and a preliminary illustration rather than a final scientific result.
+
+## Identity Mapping Experiment (full_training) Observations
+
+This lightweight identity-mapping run produced comparable metrics and layer-wise gradient statistics for PlainNet, standard ResNet, PreAct ResNet, and scaled shortcut variants. Because the run is intentionally small, conclusions should be treated as preliminary pipeline evidence.
+
+## Lesion Study Observations
+
+The lesion study verifies that residual branch masks can be applied without breaking the forward path. Because this run uses a lightweight checkpoint and may use FakeData fallback, the observed accuracy trend should be interpreted as pipeline evidence and a preliminary illustration rather than a final scientific result.
+
+## Toy 1D Init Gradient Analysis Observations
+
+Toy 1D initialization gradients were computed in eval mode with no optimizer updates.
+The scripts can emit raw gradient vectors, one-row gradient matrices, covariance matrices, ACF values, and summary metrics; the organized Git-ready results retain the figures, tables, metadata, and manifests while omitting raw `.npy` caches.
+Only seed 0 should be interpreted as a quick-run setting unless the script is rerun with more seeds.
+
+## Toy 1D Checkpoint Gradient Evolution Observations
+
+Toy 1D checkpoint gradients were computed after saving epoch 0 before optimizer updates.
+Training uses a synthetic regression target y = sin(3x) + 0.3 cos(7x).
+Gradient analysis is read-only and uses eval mode for every saved checkpoint.
+
+## CIFAR-10 Init Gradient Analysis Observations
+
+CIFAR-10 initialization analysis used real CIFAR-10 test samples and fixed minibatch indices.
+Gradient analysis was read-only: models were in eval mode and no optimizer step was called.
+This run used the runtime-limited setting from the plan: seed 0, depths 20 and 56, batch size 64, and 5 minibatches unless rerun with broader arguments.
+
+## CIFAR-10 Checkpoint Gradient Evolution Observations
+
+CIFAR-10 checkpoint analysis used fixed real CIFAR-10 test minibatches and per-sample input gradients.
+The run compares a fresh epoch 0 initialization with the existing full_training final checkpoints; intermediate epoch checkpoints were not present in the source checkpoint directory.
+Gradient analysis is read-only and does not update model parameters.
+
+## Gradient Structure Plan Concrete Findings
+
+These findings come from the plan-specific outputs under `results/toy1d_init_gradient_analysis/`, `results/toy1d_checkpoint_gradient_evolution/`, `results/cifar10_init_gradient_analysis/`, and `results/cifar10_checkpoint_gradient_evolution/`.
+
+- Toy 1D initialization: at depth 50, PlainNet gradients nearly collapsed (`gradient_std` about `1.02e-20`, `acf_lag1` about `2.50e-26`), while Standard ResNet / ScaledShortcut lambda=1.0 kept much larger gradient variation (`gradient_std` about `0.405`) and high local ACF (`acf_lag1` about `0.984`). PreAct ResNet also retained structure (`acf_lag1` about `0.928`).
+- Toy 1D plotting note: PlainNet depth 24/50 gradients are orders of magnitude smaller than residual-family gradients, so they should be inspected with the PlainNet-only figures. Standard ResNet and ScaledShortcut lambda=1.0 have identical raw Toy 1D gradient vectors in the current implementation, so their lines overlap exactly in combined plots.
+- Toy 1D checkpoint training: PlainNet did not fit the synthetic regression target in the 10-epoch quick run (`val_loss` stayed about `0.566`) and its ACF stayed near zero. ResNet, PreAct ResNet, and ScaledShortcut lambda=1.0 reached `val_loss` around `0.009-0.010` with high ACF, suggesting the residual-style toy models preserved a usable gradient structure during this run.
+- CIFAR-10 initialization: on real CIFAR-10 fixed minibatches, PlainNet-56 again showed near-zero input gradients (`mean_gradient_norm_mean` about `3.44e-24`, spatial `acf_lag1` about `1.17e-34`). ResNet-56 / ScaledShortcut lambda=1.0 and PreAct ResNet-56 retained nonzero input-gradient structure (`mean_gradient_norm_mean` about `8.46e-4`, spatial `acf_lag1` about `0.268`).
+- CIFAR-10 checkpoint evolution: after full_training final checkpoints, PlainNet-56 recovered nonzero gradient structure and reached `val_accuracy=0.7137`, but ResNet-56, PreAct ResNet-56, and ScaledShortcut lambda=1.0 had higher final validation accuracy (`0.8077`, `0.7988`, and `0.8220` respectively) with strong mean input-gradient norms.
+
+Interpretation should remain cautious: in this implementation the deepest PlainNet often shows gradient collapse, which is related to but not identical to white-noise-like shattering. The CIFAR analyses used the plan's runtime-limited setting: seed 0, batch size 64, and 5 fixed minibatches. The checkpoint experiment used epoch 0 plus existing final full_training checkpoints because intermediate full_training checkpoints were not available; model checkpoint files are excluded from the organized Git-ready results and should be regenerated when needed.
+
+## PlainNet Init Ablation Diagnostics Observations
+
+PlainNet initialization/normalization variants were diagnosed before making any shattered-gradient claim.
+The diagnostic rule is explicit: if mean sample input-gradient norm < 1e-8 or input-gradient std < 1e-8, the result is labeled gradient_collapse.
+Only non-collapsed variants are placed in the shattered-gradient candidate table; collapsed variants are separated under vanishing_collapse_analysis.
+PlainNet-HeInit-BN is recorded as the main PlainNet setting for future shattered-gradient comparisons with ResNet.
+
+### Collapse vs Shattered-Gradient Distinction
+
+- A near-zero gradient correlation matrix is not sufficient evidence for shattered gradients. If the input gradients are numerically near zero, cosine similarity is degenerate and the correct label is gradient collapse/vanishing.
+- The diagnostic rule for these results is: `input_gradient_norm_mean < 1e-8` or `gradient_std < 1e-8` implies `gradient_collapse`.
+- In `results/plainnet_init_ablation/`, `PlainNet-DefaultInit` was labeled `gradient_collapse` (`input_gradient_norm_mean` about `2.58e-23`, `gradient_std=0.0`). `PlainNet-XavierInit` was also labeled `gradient_collapse` (`input_gradient_norm_mean` about `4.22e-11`, `gradient_std` about `7.75e-13`).
+- `PlainNet-HeInit`, `PlainNet-HeInit-BN`, and `PlainNet-OrthogonalInit` passed the non-collapse rule and are stored as shattered-gradient candidates. Among them, `PlainNet-HeInit-BN` is the main PlainNet setting for future ResNet comparisons because it combines He initialization with calibrated batch normalization and has a robust nonzero input-gradient norm (`input_gradient_norm_mean` about `2.13`, `gradient_std` about `3.95e-2`).
+- Final conclusions about shattered gradients should therefore use `PlainNet-HeInit-BN` or another non-collapsed PlainNet variant. The previous default PlainNet epoch-0 CIFAR-10 correlation image should be described as gradient collapse, not as white-noise-like shattering.

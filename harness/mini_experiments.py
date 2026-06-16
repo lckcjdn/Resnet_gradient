@@ -39,6 +39,7 @@ class ModelSpec:
 @dataclass(frozen=True)
 class RunSettings:
     result_root: Path
+    data_root: str
     dataset: str
     download: bool
     train_size: int
@@ -52,6 +53,7 @@ class RunSettings:
     max_eval_batches: Optional[int] = None
     num_workers: int = 0
     torch_threads: int = 2
+    log_interval: int = 100
 
 
 def set_global_seed(seed: int) -> None:
@@ -71,6 +73,17 @@ def choose_device(requested: str) -> str:
     if requested == "auto":
         return "cuda" if torch.cuda.is_available() else "cpu"
     return requested
+
+
+def cuda_memory_text(device: str) -> str:
+    if not str(device).startswith("cuda"):
+        return ""
+    import torch
+
+    allocated = torch.cuda.memory_allocated() / 1024**2
+    reserved = torch.cuda.memory_reserved() / 1024**2
+    peak = torch.cuda.max_memory_allocated() / 1024**2
+    return f" cuda_mem={allocated:.1f}MiB reserved={reserved:.1f}MiB peak={peak:.1f}MiB"
 
 
 def ensure_dirs(root: Path) -> Dict[str, Path]:
@@ -253,13 +266,14 @@ def run_model_suite(
     device = choose_device(settings.device)
     _, _, dataset_info = build_small_image_loaders(
         dataset=settings.dataset,
-        root="data",
+        root=settings.data_root,
         batch_size=settings.batch_size,
         train_size=settings.train_size,
         val_size=settings.val_size,
         seed=settings.seed,
         download=settings.download,
         num_workers=settings.num_workers,
+        pin_memory=str(device).startswith("cuda"),
     )
 
     metrics_rows: List[Dict] = []
@@ -268,8 +282,20 @@ def run_model_suite(
     status_rows: List[Dict] = []
     checkpoints: Dict[str, str] = {}
     started = datetime.now().isoformat(timespec="seconds")
+    metrics_path = paths["tables"] / f"{table_prefix}_metrics.csv"
+    model_table = paths["tables"] / f"{table_prefix}_model_comparison.csv"
+    grad_table = paths["tables"] / f"{table_prefix}_gradient_stability.csv"
+    status_table = paths["tables"] / f"{table_prefix}_status.csv"
+    gradient_path = paths["gradients"] / f"{table_prefix}_gradient_stats.csv"
+    print(
+        f"[suite:{run_name}] device={device} dataset={dataset_info.name} "
+        f"train={dataset_info.train_size} val={dataset_info.val_size} "
+        f"epochs={settings.epochs} batch_size={settings.batch_size} "
+        f"num_workers={settings.num_workers}",
+        flush=True,
+    )
 
-    for spec in specs:
+    for spec_index, spec in enumerate(specs, start=1):
         model_started = time.perf_counter()
         status = "completed"
         notes = ""
@@ -277,13 +303,14 @@ def run_model_suite(
         try:
             train_loader, val_loader, dataset_info = build_small_image_loaders(
                 dataset=settings.dataset,
-                root="data",
+                root=settings.data_root,
                 batch_size=settings.batch_size,
                 train_size=settings.train_size,
                 val_size=settings.val_size,
                 seed=settings.seed,
                 download=settings.download,
                 num_workers=settings.num_workers,
+                pin_memory=str(device).startswith("cuda"),
             )
             set_global_seed(settings.seed)
             model = build_model(
@@ -301,7 +328,20 @@ def run_model_suite(
             )
             best_val_accuracy = 0.0
             final_grad_summary: Dict[str, float] = {}
+            model_device = next(model.parameters()).device
+            print(
+                f"[model {spec_index}/{len(specs)}] {spec.label} start "
+                f"params={count_parameters(model)} model_device={model_device}"
+                f"{cuda_memory_text(device)}",
+                flush=True,
+            )
             for epoch in range(1, settings.epochs + 1):
+                epoch_started = time.perf_counter()
+                print(
+                    f"[model {spec_index}/{len(specs)}:{spec.label}] "
+                    f"epoch {epoch}/{settings.epochs} train start",
+                    flush=True,
+                )
                 train_metrics = train_one_epoch(
                     model,
                     train_loader,
@@ -309,6 +349,11 @@ def run_model_suite(
                     optimizer,
                     device=device,
                     max_batches=settings.max_train_batches,
+                    log_interval=settings.log_interval,
+                    progress_prefix=(
+                        f"[model {spec_index}/{len(specs)}:{spec.label}] "
+                        f"epoch {epoch}/{settings.epochs}"
+                    ),
                 )
                 grad_records = collect_gradient_stats(
                     model,
@@ -319,6 +364,11 @@ def run_model_suite(
                 )
                 gradient_rows.extend(grad_records)
                 final_grad_summary = gradient_stability_summary(grad_records)
+                print(
+                    f"[model {spec_index}/{len(specs)}:{spec.label}] "
+                    f"epoch {epoch}/{settings.epochs} eval start",
+                    flush=True,
+                )
                 val_metrics = evaluate(
                     model,
                     val_loader,
@@ -327,6 +377,19 @@ def run_model_suite(
                     max_batches=settings.max_eval_batches,
                 )
                 best_val_accuracy = max(best_val_accuracy, float(val_metrics["accuracy"]))
+                epoch_runtime = time.perf_counter() - epoch_started
+                print(
+                    f"[model {spec_index}/{len(specs)}:{spec.label}] "
+                    f"epoch {epoch}/{settings.epochs} done "
+                    f"train_loss={train_metrics['loss']:.4f} "
+                    f"train_acc={train_metrics['accuracy']:.4f} "
+                    f"val_loss={val_metrics['loss']:.4f} "
+                    f"val_acc={val_metrics['accuracy']:.4f} "
+                    f"best_val_acc={best_val_accuracy:.4f} "
+                    f"elapsed={epoch_runtime:.1f}s"
+                    f"{cuda_memory_text(device)}",
+                    flush=True,
+                )
                 metrics_rows.append(
                     {
                         "run": run_name,
@@ -345,6 +408,8 @@ def run_model_suite(
                         "device": device,
                     }
                 )
+                write_csv(metrics_path, metrics_rows)
+                write_csv(gradient_path, gradient_rows)
 
             runtime_sec = time.perf_counter() - model_started
             save_checkpoint(
@@ -362,6 +427,12 @@ def run_model_suite(
                 },
             )
             checkpoints[spec.label] = str(checkpoint_path)
+            print(
+                f"[model {spec_index}/{len(specs)}] {spec.label} finished "
+                f"best_val_acc={best_val_accuracy:.4f} runtime={runtime_sec:.1f}s "
+                f"checkpoint={checkpoint_path}",
+                flush=True,
+            )
             last_metrics = [row for row in metrics_rows if row["model"] == spec.label][-1]
             summary_rows.append(
                 {
@@ -391,6 +462,7 @@ def run_model_suite(
                 }
             )
         except Exception as exc:
+            print(f"[model {spec_index}/{len(specs)}] {spec.label} failed: {exc}", flush=True)
             status = "failed"
             notes = repr(exc)
         status_rows.append(
@@ -402,12 +474,10 @@ def run_model_suite(
                 "notes": notes,
             }
         )
-
-    metrics_path = paths["tables"] / f"{table_prefix}_metrics.csv"
-    model_table = paths["tables"] / f"{table_prefix}_model_comparison.csv"
-    grad_table = paths["tables"] / f"{table_prefix}_gradient_stability.csv"
-    status_table = paths["tables"] / f"{table_prefix}_status.csv"
-    gradient_path = paths["gradients"] / f"{table_prefix}_gradient_stats.csv"
+        write_csv(status_table, status_rows)
+        if summary_rows:
+            write_csv(model_table, summary_rows)
+            write_csv(grad_table, summary_rows)
 
     write_csv(metrics_path, metrics_rows)
     write_csv(model_table, summary_rows)
@@ -574,9 +644,17 @@ def run_smoke(args) -> Dict[str, object]:
     output_tag = clean_tag(getattr(args, "output_tag", ""))
     run_name = tagged_name("smoke_test", output_tag)
     table_prefix = tagged_name("smoke", output_tag)
-    result_root = Path("results") if not output_tag else Path("results") / f"smoke_{output_tag}"
+    output_root = getattr(args, "output_root", "")
+    result_root = (
+        Path(output_root)
+        if output_root
+        else Path("results")
+        if not output_tag
+        else Path("results") / f"smoke_{output_tag}"
+    )
     settings = RunSettings(
         result_root=result_root,
+        data_root=getattr(args, "data_root", "data"),
         dataset=args.dataset,
         download=args.download,
         train_size=args.train_size,
@@ -588,7 +666,9 @@ def run_smoke(args) -> Dict[str, object]:
         device=args.device,
         max_train_batches=args.max_train_batches,
         max_eval_batches=args.max_eval_batches,
+        num_workers=getattr(args, "num_workers", 0),
         torch_threads=args.torch_threads,
+        log_interval=getattr(args, "log_interval", 100),
     )
     command = " ".join(sys.argv)
     result = run_model_suite(
@@ -644,13 +724,16 @@ def run_identity(args) -> Dict[str, object]:
     output_tag = clean_tag(getattr(args, "output_tag", ""))
     run_name = tagged_name("identity_mapping", output_tag)
     table_prefix = tagged_name("identity", output_tag)
-    result_root = (
-        Path("results") / "identity_mapping"
-        if not output_tag
-        else Path("results") / f"identity_mapping_{output_tag}"
-    )
+    output_root = getattr(args, "output_root", "")
+    if output_root:
+        result_root = Path(output_root)
+    elif output_tag:
+        result_root = Path("results") / f"identity_mapping_{output_tag}"
+    else:
+        result_root = Path("results") / "identity_mapping"
     settings = RunSettings(
         result_root=result_root,
+        data_root=getattr(args, "data_root", "data"),
         dataset=args.dataset,
         download=args.download,
         train_size=args.train_size,
@@ -662,7 +745,9 @@ def run_identity(args) -> Dict[str, object]:
         device=args.device,
         max_train_batches=args.max_train_batches,
         max_eval_batches=args.max_eval_batches,
+        num_workers=getattr(args, "num_workers", 0),
         torch_threads=args.torch_threads,
+        log_interval=getattr(args, "log_interval", 100),
     )
     command = " ".join(sys.argv)
     result = run_model_suite(

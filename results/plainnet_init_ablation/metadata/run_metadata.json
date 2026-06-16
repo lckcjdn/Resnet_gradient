@@ -1,0 +1,55 @@
+{
+  "created_at": "2026-06-16T13:56:14",
+  "command": "python.exe scripts\\run_plainnet_init_ablation.py --depth 56 --seed 0 --batch-size 64 --num-batches 5 --data-root data/cifar10_verified --device auto",
+  "python": "E:\\python\\envs\\resnet-gradient-path-study\\python.exe",
+  "experiment": "plainnet_init_ablation",
+  "data_root": "data/cifar10_verified",
+  "depth": 56,
+  "seed": 0,
+  "batch_size": 64,
+  "num_batches": 5,
+  "device": "cuda",
+  "diagnostic_rule": "if input_gradient_norm_mean < 1e-8 or gradient_std < 1e-8, label as gradient_collapse rather than shattered_gradient_candidate",
+  "variants": [
+    {
+      "label": "PlainNet-DefaultInit",
+      "slug": "plainnet_default_init",
+      "init_scheme": "default",
+      "uses_bn": true,
+      "calibrate_bn": false,
+      "main_shattered_setting": false
+    },
+    {
+      "label": "PlainNet-XavierInit",
+      "slug": "plainnet_xavier_init",
+      "init_scheme": "xavier",
+      "uses_bn": false,
+      "calibrate_bn": false,
+      "main_shattered_setting": false
+    },
+    {
+      "label": "PlainNet-HeInit",
+      "slug": "plainnet_he_init",
+      "init_scheme": "he",
+      "uses_bn": false,
+      "calibrate_bn": false,
+      "main_shattered_setting": false
+    },
+    {
+      "label": "PlainNet-HeInit-BN",
+      "slug": "plainnet_he_init_bn",
+      "init_scheme": "he",
+      "uses_bn": true,
+      "calibrate_bn": true,
+      "main_shattered_setting": true
+    },
+    {
+      "label": "PlainNet-OrthogonalInit",
+      "slug": "plainnet_orthogonal_init",
+      "init_scheme": "orthogonal",
+      "uses_bn": false,
+      "calibrate_bn": false,
+      "main_shattered_setting": false
+    }
+  ]
+}

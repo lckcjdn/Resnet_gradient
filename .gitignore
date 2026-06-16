@@ -11,6 +11,7 @@ build/
 *.egg-info/
 
 data/cifar-10-batches-py/
+data/cifar10_verified/
 data/raw/
 data/*.tar.gz
 
@@ -21,6 +22,8 @@ results/**/checkpoints/*.pth
 results/runs/*/checkpoints/
 results/runs/*/*.pt
 results/runs/*/*.pth
+results/**/*.npy
+results/**/raw/
 
 .DS_Store
 Thumbs.db

@@ -1,0 +1,10 @@
+path,bytes,modified
+results\plainnet_init_ablation\shattered_gradient_analysis\artifact_manifest.csv,1993,2026-06-16T13:56:14
+results\plainnet_init_ablation\shattered_gradient_analysis\figures\fig_centered_gradient_correlation_plainnet_he_init.png,253846,2026-06-16T13:56:09
+results\plainnet_init_ablation\shattered_gradient_analysis\figures\fig_centered_gradient_correlation_plainnet_he_init_bn.png,252318,2026-06-16T13:56:11
+results\plainnet_init_ablation\shattered_gradient_analysis\figures\fig_centered_gradient_correlation_plainnet_orthogonal_init.png,252577,2026-06-16T13:56:12
+results\plainnet_init_ablation\shattered_gradient_analysis\figures\fig_gradient_correlation_plainnet_he_init.png,253913,2026-06-16T13:56:09
+results\plainnet_init_ablation\shattered_gradient_analysis\figures\fig_gradient_correlation_plainnet_he_init_bn.png,252342,2026-06-16T13:56:10
+results\plainnet_init_ablation\shattered_gradient_analysis\figures\fig_gradient_correlation_plainnet_orthogonal_init.png,253480,2026-06-16T13:56:12
+results\plainnet_init_ablation\shattered_gradient_analysis\tables\table_main_plainnet_shattered_setting.csv,1007,2026-06-16T13:56:12
+results\plainnet_init_ablation\shattered_gradient_analysis\tables\table_plainnet_shattered_gradient_candidates.csv,2003,2026-06-16T13:56:12

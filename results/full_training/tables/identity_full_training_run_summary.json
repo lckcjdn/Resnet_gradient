@@ -1,0 +1,32 @@
+{
+  "run": "identity_mapping_full_training",
+  "command": "python -m harness.run_suite --suite identity --dataset cifar10 --data-root data\\cifar10_verified --epochs 30 --train-size 50000 --val-size 10000 --batch-size 64 --num-workers 2 --learning-rate 0.025 --seed 0 --device cuda --torch-threads 2 --log-interval 100 --output-tag full_training --output-root results\\full_training",
+  "dataset": {
+    "name": "CIFAR10",
+    "train_size": 50000,
+    "val_size": 10000,
+    "root": "data\\cifar10_verified",
+    "fallback_reason": ""
+  },
+  "figures": [
+    "results\\full_training\\figures\\fig_identity_loss_curve.png",
+    "results\\full_training\\figures\\fig_identity_accuracy_curve.png",
+    "results\\full_training\\figures\\fig_identity_layerwise_grad_norm.png",
+    "results\\full_training\\figures\\fig_identity_gradient_heatmap_all.png"
+  ],
+  "tables": [
+    "results\\full_training\\tables\\identity_full_training_model_comparison.csv",
+    "results\\full_training\\tables\\identity_full_training_gradient_stability.csv",
+    "results\\full_training\\tables\\identity_full_training_status.csv"
+  ],
+  "gradient_path": "results\\full_training\\gradients\\identity_full_training_gradient_stats.csv",
+  "checkpoints": {
+    "PlainNet-56": "results\\full_training\\checkpoints\\PlainNet-56.pt",
+    "ResNet-56": "results\\full_training\\checkpoints\\ResNet-56.pt",
+    "PreActResNet-56": "results\\full_training\\checkpoints\\PreActResNet-56.pt",
+    "ScaledShortcutResNet-56-lambda0.5": "results\\full_training\\checkpoints\\ScaledShortcutResNet-56-lambda0.5.pt",
+    "ScaledShortcutResNet-56-lambda0.9": "results\\full_training\\checkpoints\\ScaledShortcutResNet-56-lambda0.9.pt",
+    "ScaledShortcutResNet-56-lambda1.0": "results\\full_training\\checkpoints\\ScaledShortcutResNet-56-lambda1.0.pt",
+    "ScaledShortcutResNet-56-lambda1.1": "results\\full_training\\checkpoints\\ScaledShortcutResNet-56-lambda1.1.pt"
+  }
+}

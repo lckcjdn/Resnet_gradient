@@ -1,0 +1,43 @@
+{
+  "created_at": "2026-06-16T12:58:18",
+  "command": "python.exe scripts/run_toy1d_init_gradients.py --depths 2 24 50 --seeds 0 --device auto",
+  "python": "E:\\python\\envs\\resnet-gradient-path-study\\python.exe",
+  "experiment": "toy1d_init_gradient_analysis",
+  "depths": [
+    2,
+    24,
+    50
+  ],
+  "seeds": [
+    0
+  ],
+  "width": 200,
+  "points": 256,
+  "device": "cuda",
+  "models": [
+    {
+      "slug": "plain",
+      "label": "PlainNet",
+      "family": "PlainNet",
+      "shortcut_lambda": 1.0
+    },
+    {
+      "slug": "resnet",
+      "label": "Standard ResNet",
+      "family": "ResNetV1",
+      "shortcut_lambda": 1.0
+    },
+    {
+      "slug": "preact",
+      "label": "PreAct ResNet",
+      "family": "PreActResNet",
+      "shortcut_lambda": 1.0
+    },
+    {
+      "slug": "scaled_l1p0",
+      "label": "ScaledShortcut lambda=1.0",
+      "family": "ScaledShortcutResNet",
+      "shortcut_lambda": 1.0
+    }
+  ]
+}

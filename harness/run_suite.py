@@ -15,6 +15,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     parser = argparse.ArgumentParser(description="Run a suite of experiments.")
     parser.add_argument("--suite", choices=SUITES, default="smoke")
     parser.add_argument("--dataset", choices=["auto", "cifar10", "fake"], default="auto")
+    parser.add_argument("--data-root", default="data", help="Dataset root directory.")
     parser.add_argument("--download", action="store_true", help="Allow CIFAR-10 download before FakeData fallback.")
     parser.add_argument("--epochs", type=int, default=1)
     parser.add_argument("--train-size", type=int, default=128)
@@ -25,11 +26,23 @@ def main(argv: Optional[List[str]] = None) -> int:
     parser.add_argument("--device", default="auto")
     parser.add_argument("--max-train-batches", type=int, default=None)
     parser.add_argument("--max-eval-batches", type=int, default=None)
+    parser.add_argument("--num-workers", type=int, default=0, help="DataLoader worker processes.")
     parser.add_argument("--torch-threads", type=int, default=2)
+    parser.add_argument(
+        "--log-interval",
+        type=int,
+        default=100,
+        help="Print training progress every N batches. Use 0 to disable batch progress.",
+    )
     parser.add_argument(
         "--output-tag",
         default="",
         help="Optional suffix for result directories and table names, e.g. cifar10.",
+    )
+    parser.add_argument(
+        "--output-root",
+        default="",
+        help="Optional exact result root directory. Defaults to suite/tag-based paths.",
     )
     args = parser.parse_args(argv)
 

@@ -1,0 +1,16 @@
+{
+  "summary_table": "results\\plainnet_init_ablation\\tables\\table_plainnet_init_ablation_summary.csv",
+  "collapse_table": "results\\plainnet_init_ablation\\vanishing_collapse_analysis\\tables\\table_plainnet_gradient_collapse_summary.csv",
+  "shattered_table": "results\\plainnet_init_ablation\\shattered_gradient_analysis\\tables\\table_plainnet_shattered_gradient_candidates.csv",
+  "main_plainnet_setting": "PlainNet-HeInit-BN",
+  "diagnostic_rule": "mean gradient norm < 1e-8 or gradient std < 1e-8 => gradient_collapse",
+  "collapse_variants": [
+    "PlainNet-DefaultInit",
+    "PlainNet-XavierInit"
+  ],
+  "shattered_candidate_variants": [
+    "PlainNet-HeInit",
+    "PlainNet-HeInit-BN",
+    "PlainNet-OrthogonalInit"
+  ]
+}

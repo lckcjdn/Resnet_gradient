@@ -1,0 +1,47 @@
+{
+  "created_at": "2026-06-16T13:00:46",
+  "command": "python.exe scripts/run_cifar10_checkpoint_gradients.py --depth 56 --checkpoints 0 final --batch-size 64 --num-batches 5 --seeds 0 --data-root data/cifar10_verified --checkpoint-root results/full_training/checkpoints --metrics-csv results/full_training/tables/identity_full_training_metrics.csv --device auto",
+  "python": "E:\\python\\envs\\resnet-gradient-path-study\\python.exe",
+  "experiment": "cifar10_checkpoint_gradient_evolution",
+  "data_root": "data/cifar10_verified",
+  "checkpoint_root": "results\\full_training\\checkpoints",
+  "metrics_csv": "results\\full_training\\tables\\identity_full_training_metrics.csv",
+  "depth": 56,
+  "checkpoints": [
+    "0",
+    "final"
+  ],
+  "final_epoch_from_metrics": 30,
+  "seeds": [
+    0
+  ],
+  "batch_size": 64,
+  "num_batches": 5,
+  "device": "cuda",
+  "models": [
+    {
+      "slug": "plain",
+      "label": "PlainNet",
+      "family": "PlainNet",
+      "shortcut_lambda": 1.0
+    },
+    {
+      "slug": "resnet",
+      "label": "Standard ResNet",
+      "family": "ResNetV1",
+      "shortcut_lambda": 1.0
+    },
+    {
+      "slug": "preact",
+      "label": "PreAct ResNet",
+      "family": "PreActResNet",
+      "shortcut_lambda": 1.0
+    },
+    {
+      "slug": "scaled_l1p0",
+      "label": "ScaledShortcut lambda=1.0",
+      "family": "ScaledShortcutResNet",
+      "shortcut_lambda": 1.0
+    }
+  ]
+}

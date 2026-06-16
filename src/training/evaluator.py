@@ -13,12 +13,13 @@ def evaluate(model, loader, criterion, device: str = "cpu", max_batches: Optiona
     total_loss = 0.0
     correct = 0
     total = 0
+    non_blocking = str(device).startswith("cuda")
     with torch.no_grad():
         for batch_index, (inputs, targets) in enumerate(loader):
             if max_batches is not None and batch_index >= max_batches:
                 break
-            inputs = inputs.to(device)
-            targets = targets.to(device)
+            inputs = inputs.to(device, non_blocking=non_blocking)
+            targets = targets.to(device, non_blocking=non_blocking)
             outputs = model(inputs)
             loss = criterion(outputs, targets)
             batch_size = targets.size(0)

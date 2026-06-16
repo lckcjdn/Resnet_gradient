@@ -1,0 +1,8 @@
+run,model,status,checkpoint_path,notes
+identity_mapping_full_training,PlainNet-56,completed,results\full_training\checkpoints\PlainNet-56.pt,
+identity_mapping_full_training,ResNet-56,completed,results\full_training\checkpoints\ResNet-56.pt,
+identity_mapping_full_training,PreActResNet-56,completed,results\full_training\checkpoints\PreActResNet-56.pt,
+identity_mapping_full_training,ScaledShortcutResNet-56-lambda0.5,completed,results\full_training\checkpoints\ScaledShortcutResNet-56-lambda0.5.pt,
+identity_mapping_full_training,ScaledShortcutResNet-56-lambda0.9,completed,results\full_training\checkpoints\ScaledShortcutResNet-56-lambda0.9.pt,
+identity_mapping_full_training,ScaledShortcutResNet-56-lambda1.0,completed,results\full_training\checkpoints\ScaledShortcutResNet-56-lambda1.0.pt,
+identity_mapping_full_training,ScaledShortcutResNet-56-lambda1.1,completed,results\full_training\checkpoints\ScaledShortcutResNet-56-lambda1.1.pt,

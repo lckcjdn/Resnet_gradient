@@ -50,9 +50,13 @@ def clean_tag(tag: str) -> str:
     return "".join(char.lower() if char.isalnum() else "_" for char in tag).strip("_")
 
 
-def ensure_dirs(output_tag: str = "") -> Dict[str, Path]:
+def ensure_dirs(output_tag: str = "", output_root: str = "") -> Dict[str, Path]:
     output_tag = clean_tag(output_tag)
-    root = Path("results") / ("lesion_study" if not output_tag else f"lesion_study_{output_tag}")
+    root = (
+        Path(output_root)
+        if output_root
+        else Path("results") / ("lesion_study" if not output_tag else f"lesion_study_{output_tag}")
+    )
     paths = {
         "logs": root / "logs",
         "figures": root / "figures",
@@ -224,7 +228,7 @@ def run_lesion(args) -> Dict[str, object]:
 
     torch.set_num_threads(max(1, args.torch_threads))
     output_tag = clean_tag(args.output_tag)
-    paths = ensure_dirs(output_tag)
+    paths = ensure_dirs(output_tag, args.output_root)
     device = choose_device(args.device)
     checkpoint_path = find_checkpoint(args.checkpoint, output_tag)
     model, payload = load_model_from_checkpoint(checkpoint_path, device)
@@ -233,13 +237,14 @@ def run_lesion(args) -> Dict[str, object]:
 
     _, val_loader, dataset_info = build_small_image_loaders(
         dataset=args.dataset,
-        root="data",
+        root=args.data_root,
         batch_size=args.batch_size,
         train_size=args.val_size,
         val_size=args.val_size,
         seed=args.seed,
         download=args.download,
-        num_workers=0,
+        num_workers=args.num_workers,
+        pin_memory=str(device).startswith("cuda"),
     )
     criterion = nn.CrossEntropyLoss()
     baseline = evaluate(model, val_loader, criterion, device=device, max_batches=args.max_eval_batches)
@@ -463,11 +468,13 @@ def main(argv: Optional[List[str]] = None) -> int:
     parser = argparse.ArgumentParser(description="Run residual branch lesion study.")
     parser.add_argument("--checkpoint", default=None)
     parser.add_argument("--dataset", choices=["auto", "cifar10", "fake"], default="auto")
+    parser.add_argument("--data-root", default="data", help="Dataset root directory.")
     parser.add_argument("--download", action="store_true")
     parser.add_argument("--val-size", type=int, default=72)
     parser.add_argument("--batch-size", type=int, default=24)
     parser.add_argument("--device", default="auto")
     parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument("--num-workers", type=int, default=0, help="DataLoader worker processes.")
     parser.add_argument("--random-seeds", default="0,1,2")
     parser.add_argument("--drop-ratios", default="0,0.1,0.3,0.5,0.7")
     parser.add_argument("--max-eval-batches", type=int, default=None)
@@ -476,6 +483,11 @@ def main(argv: Optional[List[str]] = None) -> int:
         "--output-tag",
         default="",
         help="Optional suffix for result directory and docs, e.g. cifar10.",
+    )
+    parser.add_argument(
+        "--output-root",
+        default="",
+        help="Optional exact result root directory. Defaults to tag-based lesion paths.",
     )
     args = parser.parse_args(argv)
     run_lesion(args)

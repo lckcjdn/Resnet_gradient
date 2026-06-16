@@ -82,6 +82,7 @@ def build_small_image_loaders(
     seed: int = 0,
     download: bool = False,
     num_workers: int = 0,
+    pin_memory: bool = False,
 ):
     """Build small CIFAR-10 loaders or deterministic FakeData fallback loaders."""
     import torch
@@ -154,12 +155,16 @@ def build_small_image_loaders(
         shuffle=True,
         num_workers=num_workers,
         generator=loader_generator,
+        pin_memory=pin_memory,
+        persistent_workers=num_workers > 0,
     )
     val_loader = torch.utils.data.DataLoader(
         val_set,
         batch_size=batch_size,
         shuffle=False,
         num_workers=num_workers,
+        pin_memory=pin_memory,
+        persistent_workers=num_workers > 0,
     )
     info = DatasetInfo(
         name=dataset_name,
