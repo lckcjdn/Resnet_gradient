@@ -61,6 +61,8 @@ Generated artifacts:
 - `results/identity_mapping_cifar10/tables/table_identity_cifar10_gradient_stability.csv`
 - `results/identity_mapping_cifar10/tables/table_identity_cifar10_lambda_ablation.csv`
 
+Heatmap redraw note: the identity heatmaps now use a shared `log10_grad_norm` color scale from `-2.9018` to `-0.0602`, computed from `results/identity_mapping_cifar10/gradients/identity_cifar10_gradient_stats.csv`.
+
 Analysis:
 
 - PlainNet-56 remained near chance-level validation accuracy at 11.33%.
@@ -108,4 +110,3 @@ Analysis:
 - FakeData results validate the code path only: model construction, training loop, gradient collection, plotting, tables, and lesion masks.
 - CIFAR-10 results are the real experimental evidence in this repository.
 - The CIFAR-10 runs are still lightweight: small subsets, short training, and mostly single seed. Use cautious language such as "supports", "suggests", and "is consistent with".
-

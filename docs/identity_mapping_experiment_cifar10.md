@@ -32,6 +32,8 @@ For a residual block `x_{l+1} = x_l + F_l(x_l)`, the identity term creates a dir
 - `results\identity_mapping_cifar10\figures\fig_identity_gradient_heatmap_preact_resnet.png`
 - `results\identity_mapping_cifar10\figures\fig_identity_lambda_ablation_grad_ratio.png`
 
+Heatmap note: the CIFAR-10 identity gradient heatmaps were redrawn with a shared `log10_grad_norm` color scale from `-2.9018` to `-0.0602`, so colors are comparable across model-specific heatmaps.
+
 ## Generated Tables
 
 - `results\identity_mapping_cifar10\tables\table_identity_cifar10_model_comparison.csv`

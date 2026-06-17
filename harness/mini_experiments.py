@@ -180,7 +180,27 @@ def plot_layerwise_gradients(rows: Sequence[Dict], output_path: Path, title: str
     plt.close(fig)
 
 
-def plot_gradient_heatmap(rows: Sequence[Dict], output_path: Path, title: str, model: Optional[str] = None) -> None:
+def gradient_heatmap_limits(rows: Sequence[Dict]) -> Optional[tuple[float, float]]:
+    values = []
+    for row in rows:
+        try:
+            value = float(row["log10_grad_norm"])
+        except (KeyError, TypeError, ValueError):
+            continue
+        if math.isfinite(value):
+            values.append(value)
+    if not values:
+        return None
+    return min(values), max(values)
+
+
+def plot_gradient_heatmap(
+    rows: Sequence[Dict],
+    output_path: Path,
+    title: str,
+    model: Optional[str] = None,
+    value_limits: Optional[tuple[float, float]] = None,
+) -> None:
     filtered = [row for row in rows if model is None or row["model"] == model]
     if not filtered:
         return
@@ -194,7 +214,13 @@ def plot_gradient_heatmap(rows: Sequence[Dict], output_path: Path, title: str, m
         for epoch in epochs:
             epoch_rows = {int(item["layer_index"]): float(item["log10_grad_norm"]) for item in group if int(item["epoch"]) == epoch}
             matrix.append([epoch_rows.get(layer, math.nan) for layer in layers])
-        image = axis.imshow(matrix, aspect="auto", interpolation="nearest")
+        image = axis.imshow(
+            matrix,
+            aspect="auto",
+            interpolation="nearest",
+            vmin=value_limits[0] if value_limits else None,
+            vmax=value_limits[1] if value_limits else None,
+        )
         axis.set_title(label)
         axis.set_xlabel("layer index")
         axis.set_ylabel("epoch")
@@ -499,7 +525,12 @@ def run_model_suite(
         grad_path = paths["figures"] / figure_names["layerwise"]
         heatmap_path = paths["figures"] / figure_names["heatmap"]
         plot_layerwise_gradients(gradient_rows, grad_path, f"{run_name} Layer-wise Gradient Norm")
-        plot_gradient_heatmap(gradient_rows, heatmap_path, f"{run_name} Gradient Heatmap")
+        plot_gradient_heatmap(
+            gradient_rows,
+            heatmap_path,
+            f"{run_name} Gradient Heatmap",
+            value_limits=gradient_heatmap_limits(gradient_rows),
+        )
         figure_paths.extend([grad_path, heatmap_path])
 
     log_path = paths["logs"] / f"{run_name}_log.md"
@@ -766,12 +797,19 @@ def run_identity(args) -> Dict[str, object]:
 
     gradients = result["gradients"]
     fig_dir = result_root / "figures"
+    heatmap_limits = gradient_heatmap_limits(gradients)
     for model, filename in [
         ("PlainNet-56", "fig_identity_gradient_heatmap_plainnet.png"),
         ("ResNet-56", "fig_identity_gradient_heatmap_resnet.png"),
         ("PreActResNet-56", "fig_identity_gradient_heatmap_preact_resnet.png"),
     ]:
-        plot_gradient_heatmap(gradients, fig_dir / filename, f"{model} Gradient Heatmap", model=model)
+        plot_gradient_heatmap(
+            gradients,
+            fig_dir / filename,
+            f"{model} Gradient Heatmap",
+            model=model,
+            value_limits=heatmap_limits,
+        )
         result["figures"].append(fig_dir / filename)
     lambda_path = fig_dir / "fig_identity_lambda_ablation_grad_ratio.png"
     plot_lambda_ablation(result["summary"], lambda_path)
