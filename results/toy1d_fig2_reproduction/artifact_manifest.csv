@@ -1,0 +1,10 @@
+path,bytes,modified
+results\toy1d_fig2_reproduction\artifact_manifest.csv,819,2026-06-17T15:55:08
+results\toy1d_fig2_reproduction\figures\fig_toy1d_acf_figure2_reproduction.png,313071,2026-06-17T15:58:19
+results\toy1d_fig2_reproduction\figures\fig_toy1d_gradient_examples_depth50.png,274884,2026-06-17T15:58:20
+results\toy1d_fig2_reproduction\figures\fig_toy1d_gradient_norm_by_depth.png,66576,2026-06-17T15:58:20
+results\toy1d_fig2_reproduction\figures\fig_toy1d_gradient_std_by_depth.png,63329,2026-06-17T15:58:20
+results\toy1d_fig2_reproduction\metadata\run_metadata.json,977,2026-06-17T15:58:20
+results\toy1d_fig2_reproduction\tables\table_toy1d_acf_mean_std.csv,16374,2026-06-17T15:58:19
+results\toy1d_fig2_reproduction\tables\table_toy1d_acf_summary.csv,431742,2026-06-17T15:58:19
+results\toy1d_fig2_reproduction\tables\table_toy1d_collapse_diagnostics.csv,1697,2026-06-17T15:58:19

@@ -4,6 +4,8 @@ from .plain_cnn import PlainNet, plainnet56
 from .preact_resnet import PreActResNetCifar, preact_resnet56
 from .resnet_v1 import ResNetCifar, resnet56
 from .scaled_shortcut_resnet import ScaledShortcutResNet, scaled_shortcut_resnet56
+from .toy1d_feedforward import Toy1DFeedForward
+from .toy1d_resnet import Toy1DResNet
 
 
 def build_model(name: str, depth: int = 56, num_classes: int = 10, shortcut_lambda: float = 1.0):
@@ -29,6 +31,8 @@ __all__ = [
     "PreActResNetCifar",
     "ResNetCifar",
     "ScaledShortcutResNet",
+    "Toy1DFeedForward",
+    "Toy1DResNet",
     "build_model",
     "plainnet56",
     "preact_resnet56",

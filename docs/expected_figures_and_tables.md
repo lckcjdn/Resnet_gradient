@@ -323,3 +323,21 @@
 - `results\plainnet_init_ablation\vanishing_collapse_analysis\tables\table_plainnet_gradient_collapse_summary.csv`
 - `results\plainnet_init_ablation\shattered_gradient_analysis\tables\table_plainnet_shattered_gradient_candidates.csv`
 - `results\plainnet_init_ablation\shattered_gradient_analysis\tables\table_main_plainnet_shattered_setting.csv`
+
+## Generated Artifacts: Toy 1D Figure 2 Reproduction
+
+- Command: `python.exe scripts/run_toy1d_fig2_reproduction.py --depths 2 4 10 24 50 --width 200 --num-points 256 --x-min -2 --x-max 2 --max-lag 15 --runs 20 --seeds 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 --output-dir results/toy1d_fig2_reproduction`
+- Dataset: synthetic Toy 1D grid
+- Output root: `results\toy1d_fig2_reproduction`
+
+### Figures
+- `results\toy1d_fig2_reproduction\figures\fig_toy1d_acf_figure2_reproduction.png`
+- `results\toy1d_fig2_reproduction\figures\fig_toy1d_gradient_examples_depth50.png`
+- `results\toy1d_fig2_reproduction\figures\fig_toy1d_gradient_norm_by_depth.png`
+- `results\toy1d_fig2_reproduction\figures\fig_toy1d_gradient_std_by_depth.png`
+
+### Tables
+- `results\toy1d_fig2_reproduction\tables\table_toy1d_acf_summary.csv`
+- `results\toy1d_fig2_reproduction\tables\table_toy1d_acf_mean_std.csv`
+- `results\toy1d_fig2_reproduction\tables\table_toy1d_collapse_diagnostics.csv`
+- `results\toy1d_fig2_reproduction\artifact_manifest.csv`

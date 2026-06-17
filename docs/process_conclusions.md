@@ -193,3 +193,13 @@ PlainNet-HeInit-BN is recorded as the main PlainNet setting for future shattered
 - In `results/plainnet_init_ablation/`, `PlainNet-DefaultInit` was labeled `gradient_collapse` (`input_gradient_norm_mean` about `2.58e-23`, `gradient_std=0.0`). `PlainNet-XavierInit` was also labeled `gradient_collapse` (`input_gradient_norm_mean` about `4.22e-11`, `gradient_std` about `7.75e-13`).
 - `PlainNet-HeInit`, `PlainNet-HeInit-BN`, and `PlainNet-OrthogonalInit` passed the non-collapse rule and are stored as shattered-gradient candidates. Among them, `PlainNet-HeInit-BN` is the main PlainNet setting for future ResNet comparisons because it combines He initialization with calibrated batch normalization and has a robust nonzero input-gradient norm (`input_gradient_norm_mean` about `2.13`, `gradient_std` about `3.95e-2`).
 - Final conclusions about shattered gradients should therefore use `PlainNet-HeInit-BN` or another non-collapsed PlainNet variant. The previous default PlainNet epoch-0 CIFAR-10 correlation image should be described as gradient collapse, not as white-noise-like shattering.
+
+## Toy 1D Figure 2 Reproduction Observations
+
+This is an epoch-0 initialization-only analysis: no checkpoints, training loop, or optimizer step is used.
+Twenty-run averaging used seeds 0 to 19.
+No model-depth setting had collapsed runs under the 1e-8 norm/std rule.
+At depth 50, lag-5 mean ACF was feedforward=-0.05423, ResNet beta=1.0=0.6047, and ResNet beta=0.1=0.8404.
+The feedforward ACF decayed faster than the beta=1.0 ResNet at the comparison depth.
+The beta=0.1 ResNet preserved stronger local ACF than beta=1.0 at the comparison depth.
+The implementation is reproduction-inspired rather than exact: model layers use per-sample feature centering/normalization to keep df(x_i)/dx_i pointwise well-defined.

@@ -324,3 +324,34 @@
 - PlainNet-HeInit-BN is recorded as the main PlainNet setting for future shattered-gradient comparisons with ResNet.
 
 ---
+
+## Run: Toy 1D Figure 2 Reproduction
+
+- Date: 2026-06-17T15:58:20
+- Command: `python.exe scripts/run_toy1d_fig2_reproduction.py --depths 2 4 10 24 50 --width 200 --num-points 256 --x-min -2 --x-max 2 --max-lag 15 --runs 20 --seeds 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 --output-dir results/toy1d_fig2_reproduction`
+- Dataset: synthetic Toy 1D grid
+- Output root: `results\toy1d_fig2_reproduction`
+- Status: completed
+
+### Output Files
+
+- `results\toy1d_fig2_reproduction\figures\fig_toy1d_acf_figure2_reproduction.png`
+- `results\toy1d_fig2_reproduction\figures\fig_toy1d_gradient_examples_depth50.png`
+- `results\toy1d_fig2_reproduction\figures\fig_toy1d_gradient_norm_by_depth.png`
+- `results\toy1d_fig2_reproduction\figures\fig_toy1d_gradient_std_by_depth.png`
+- `results\toy1d_fig2_reproduction\tables\table_toy1d_acf_summary.csv`
+- `results\toy1d_fig2_reproduction\tables\table_toy1d_acf_mean_std.csv`
+- `results\toy1d_fig2_reproduction\tables\table_toy1d_collapse_diagnostics.csv`
+- `results\toy1d_fig2_reproduction\artifact_manifest.csv`
+
+### Notes
+
+- This is an epoch-0 initialization-only analysis: no checkpoints, training loop, or optimizer step is used.
+- Twenty-run averaging used seeds 0 to 19.
+- No model-depth setting had collapsed runs under the 1e-8 norm/std rule.
+- At depth 50, lag-5 mean ACF was feedforward=-0.05423, ResNet beta=1.0=0.6047, and ResNet beta=0.1=0.8404.
+- The feedforward ACF decayed faster than the beta=1.0 ResNet at the comparison depth.
+- The beta=0.1 ResNet preserved stronger local ACF than beta=1.0 at the comparison depth.
+- The implementation is reproduction-inspired rather than exact: model layers use per-sample feature centering/normalization to keep df(x_i)/dx_i pointwise well-defined.
+
+---
